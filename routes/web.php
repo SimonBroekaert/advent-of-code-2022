@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\DayController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DayOneController;
+use App\Http\Controllers\DayTwoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,8 +16,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('day-1', [DayController::class, 'one'])
-    ->name('day-1');
+Route::get('/', DayController::class)
+    ->name('days.index');
 
-Route::get('day-2', [DayController::class, 'two'])
-    ->name('day-2');
+Route::get('day-1', DayOneController::class)
+    ->name('days.show.1');
+
+Route::get('day-2', DayTwoController::class)
+    ->name('days.show.2');
