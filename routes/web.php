@@ -16,3 +16,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('day-1', [DayController::class, 'one'])
     ->name('day-1');
+
+Route::get('day-2', [DayController::class, 'two'])
+    ->name('day-2');
