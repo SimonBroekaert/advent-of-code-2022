@@ -23,7 +23,7 @@ class DayController extends Controller
             ->sortByDesc('total');
 
         $question1 = 'The most calories a single elf is carrying';
-        $answer2 = $elfInventories->first()->total;
+        $answer1 = $elfInventories->first()->total;
 
         $question2 = 'The total of the top 3 carrying elves';
         $answer2 = $elfInventories->take(3)->sum('total');
@@ -46,7 +46,7 @@ class DayController extends Controller
             ->map(function ($game) {
                 $content = explode(' ', $game);
                 return [
-                    'enemy' => match($content[0]) {
+                    'enemy' => match ($content[0]) {
                         'A' => 'rock',
                         'B' => 'paper',
                         'C' => 'scissors',
@@ -56,79 +56,81 @@ class DayController extends Controller
             });
 
         $question1 = 'Total score if second data value is your choice';
-        $answer1 = $games->map(function($game) {
-            $game['you'] = match($game['unknown']) {
+        $answer1 = $games->map(function ($game) {
+            $game['you'] = match ($game['unknown']) {
                 'X' => 'rock',
                 'Y' => 'paper',
                 'Z' => 'scissors',
             };
 
-            $game['result'] = match($game['enemy']) {
-                'rock' => match($game['you']) {
+            $game['result'] = match ($game['enemy']) {
+                'rock' => match ($game['you']) {
                     'rock' => 'draw',
                     'paper' => 'win',
                     'scissors' => 'lose',
                 },
-                'paper' => match($game['you']) {
+                'paper' => match ($game['you']) {
                     'rock' => 'lose',
                     'paper' => 'draw',
                     'scissors' => 'win',
                 },
-                'scissors' => match($game['you']) {
+                'scissors' => match ($game['you']) {
                     'rock' => 'win',
                     'paper' => 'lose',
                     'scissors' => 'draw',
                 },
             };
 
-            $game['score'] = match($game['result']) {
+            $game['score'] = match ($game['result']) {
                 'win' => 6,
                 'draw' => 3,
                 'lose' => 0,
-            } + match($game['you']) {
-                'rock' => 1,
-                'paper' => 2,
-                'scissors' => 3,
-            };
+            }
+                + match ($game['you']) {
+                    'rock' => 1,
+                    'paper' => 2,
+                    'scissors' => 3,
+                };
 
             return $game;
         })->sum('score');
 
         $question2 = 'Total score if second data value is the outcome';
-        $answer2 = $games->map(function($game) {
-            $game['result'] = match($game['unknown']) {
+        $answer2 = $games->map(function ($game) {
+            $game['result'] = match ($game['unknown']) {
                 'X' => 'lose',
                 'Y' => 'draw',
                 'Z' => 'win',
             };
 
-            $game['you'] = match($game['enemy']) {
-                'rock' => match($game['result']) {
+            $game['you'] = match ($game['enemy']) {
+                'rock' => match ($game['result']) {
                     'lose' => 'scissors',
                     'draw' => 'rock',
                     'win' => 'paper',
                 },
-                'paper' => match($game['result']) {
+                'paper' => match ($game['result']) {
                     'lose' => 'rock',
                     'draw' => 'paper',
                     'win' => 'scissors',
                 },
-                'scissors' => match($game['result']) {
+                'scissors' => match ($game['result']) {
                     'lose' => 'paper',
                     'draw' => 'scissors',
                     'win' => 'rock',
                 },
             };
 
-            $game['score'] = match($game['result']) {
+            $game['score'] = match ($game['result']) {
                 'win' => 6,
                 'draw' => 3,
                 'lose' => 0,
-            } + match($game['you']) {
-                'rock' => 1,
-                'paper' => 2,
-                'scissors' => 3,
-            };
+            }
+                + match ($game['you']) {
+                    'rock' => 1,
+                    'paper' => 2,
+                    'scissors' => 3,
+                };
 
             return $game;
         })->sum('score');
