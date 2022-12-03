@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Contracts\View\View;
 
-class DayFourController extends Controller
+class DayTwentyFiveController extends Controller
 {
     public function __invoke(): View
     {
