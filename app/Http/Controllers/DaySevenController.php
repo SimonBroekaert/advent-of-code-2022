@@ -16,8 +16,8 @@ class DaySevenController extends Controller
         $question1 = 'Sum of all directory sizes of directories smaller than 100000';
         $answer1 = $this->getSizeOfDirectoriesSmallerThan($structure, 100000);
 
-        $question2 = null;
-        $answer2 = null;
+        $question2 = 'Size of smallest directory to delete to free up at least 30000000 bytes of the total 70000000 disk size';
+        $answer2 = $this->getSizeOfDirectoryToDeleteToFreeUpAtLeast($structure, 30000000, 70000000);
 
         return view('days.show', compact(
             'question1',
@@ -99,16 +99,55 @@ class DaySevenController extends Controller
             });
     }
 
-    private function getSizeOfDirectoriesSmallerThan(Collection $structure, int $size): int
+    private function getSizeOfDirectoriesSmallerThan(Collection $structure, int $maxSize): int
     {
-        return $structure->filter(fn ($content, $dir) => $dir !== '_files')->sum(function ($content) use ($size) {
-            $dirSize = $content['_size'] ?? 0;
+        return $structure->filter(fn ($content, $dir) => $dir !== '_files')->sum(function ($content) use ($maxSize, $structure) {
+            $dirSize = (int) ($content['_size'] ?? 0);
 
-            if ($dirSize < $size) {
+            if (! $content instanceof Collection) {
                 return $dirSize;
             }
 
-            return $this->getSizeOfDirectoriesSmallerThan(collect($content), $size);
+            $sum = (int) $this->getSizeOfDirectoriesSmallerThan(collect($content), $maxSize);
+
+            if ($dirSize < $maxSize) {
+                $sum += $dirSize;
+            }
+
+            return $sum;
+        });
+    }
+
+    private function getSizeOfDirectoryToDeleteToFreeUpAtLeast(Collection $structure, int $minFreeSpace, int $totalSpace): int
+    {
+        $diskSpace = (int) $structure->filter(fn ($content, $dir) => $dir !== '_files')->sum('_size');
+        $freeSpace = $totalSpace - $diskSpace;
+        $minSpaceToFree = max($minFreeSpace - $freeSpace, 0);
+
+        if ($minSpaceToFree === 0) {
+            return 0;
+        }
+
+        dump($minSpaceToFree);
+
+        dump($this->flatDirectories($structure)
+        ->sort()
+        ->filter(fn ($size) => $size >= $minSpaceToFree));
+
+        // Flatten structure so all directories are on same level
+        return $this->flatDirectories($structure)
+            ->sort()
+            ->filter(fn ($size) => $size >= $minSpaceToFree)
+            ->first();
+    }
+
+    private function flatDirectories(Collection $structure): Collection
+    {
+        return $structure->filter(fn ($content, $dir) => $dir !== '_files' && $dir !== '_size')->mapWithKeys(function ($content, $dir) {
+            return [
+                $dir => $content['_size'] ?? 0,
+                ...$this->flatDirectories($content)->toArray(),
+            ];
         });
     }
 }
