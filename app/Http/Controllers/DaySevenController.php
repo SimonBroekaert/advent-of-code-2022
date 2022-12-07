@@ -128,12 +128,6 @@ class DaySevenController extends Controller
             return 0;
         }
 
-        dump($minSpaceToFree);
-
-        dump($this->flatDirectories($structure)
-        ->sort()
-        ->filter(fn ($size) => $size >= $minSpaceToFree));
-
         // Flatten structure so all directories are on same level
         return $this->flatDirectories($structure)
             ->sort()
